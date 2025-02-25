@@ -12,37 +12,21 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function AddClienteForm({
-  onSubmit,
-}: {
-  onSubmit: (data: FormData) => void;
-}) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-  } = useForm<FormData>({
+export default function AddClienteForm({ onSubmit }: { onSubmit: (data: FormData) => void }) {
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
-
-  const nameValue = watch("name");
-  const emailValue = watch("email");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Label htmlFor="name">Nome</Label>
-        <TextInput {...register("name")} value={nameValue} placeholder="Nome" />
+        <TextInput {...register("name")} placeholder="Nome" />
         {errors.name && <p>{errors.name.message}</p>}
       </div>
       <div>
         <Label htmlFor="email">Email</Label>
-        <TextInput
-          {...register("email")}
-          value={emailValue}
-          placeholder="Email"
-        />
+        <TextInput {...register("email")} placeholder="Email" />
         {errors.email && <p>{errors.email.message}</p>}
       </div>
       <Button type="submit">Adicionar Cliente</Button>

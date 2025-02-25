@@ -4,18 +4,24 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import AddClienteForm from "./AddClienteForm";
-import EditClienteForm from "./EditClienteForm"; // Verifique se o caminho está correto
+import EditClienteForm from "./EditClienteForm";
 
-const fetchClientes = async () => {
+interface Cliente {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const fetchClientes = async (): Promise<Cliente[]> => {
   const response = await fetch("https://jsonplaceholder.typicode.com/users");
   return response.json();
 };
 
 export default function ClientesPage() {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<Cliente[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [editingCliente, setEditingCliente] = useState<any | null>(null);
+  const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
 
   useEffect(() => {
     fetchClientes()
@@ -29,11 +35,15 @@ export default function ClientesPage() {
       });
   }, []);
 
-  const handleAddCliente = (newCliente: any) => {
-    setData([...data, newCliente]);
+  const handleAddCliente = (newCliente: { name: string; email: string }) => {
+    const id = data.length
+      ? Math.max(...data.map((cliente) => cliente.id)) + 1
+      : 1;
+    const clienteComId: Cliente = { id, ...newCliente };
+    setData([...data, clienteComId]);
   };
 
-  const handleEditCliente = (updatedCliente: any) => {
+  const handleEditCliente = (updatedCliente: Cliente) => {
     setData(
       data.map((cliente) =>
         cliente.id === updatedCliente.id ? updatedCliente : cliente
@@ -60,7 +70,7 @@ export default function ClientesPage() {
         <AddClienteForm onSubmit={handleAddCliente} />
       )}
       <ul className="border rounded-lg p-4">
-        {data.map((cliente: any) => (
+        {data.map((cliente) => (
           <li
             key={cliente.id}
             className="p-2 border-b last:border-none flex justify-between items-center"
